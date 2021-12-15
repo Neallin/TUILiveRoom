@@ -5,9 +5,9 @@
 -->
 <template lang="pug">
 div.rtc-stream-container
+  cdn-stream(ref="cdnStream" v-if="lineType === LINE_TYPE.CDN")
   rtc-stream(ref="rtcStream" v-if="lineType === LINE_TYPE.RTC")
   leb-stream(ref="lebStream" v-if="lineType === LINE_TYPE.LEB")
-  cdn-stream(ref="cdnStream" v-if="lineType === LINE_TYPE.CDN")
 </template>
 
 <script>

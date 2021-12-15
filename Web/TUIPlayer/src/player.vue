@@ -4,16 +4,16 @@
       comp-header
     div#content
       div#left
-        comp-player(ref="player")
+        comp-player(ref="player" v-if="ready")
       div#right
         comp-message(ref="message")
 </template>
 
 <script>
-import LibGenerateTestUserSig from '@/utils/lib-generate-test-usersig.min.js';
 import compHeader from '@/components/comp-header';
 import compPlayer from '@/components/comp-player';
 import compMessage from '@/components/comp-message';
+import api from '@/net/api';
 import {
   SET_SDK_APP_ID,
   SET_USER_SIG,
@@ -23,20 +23,12 @@ import {
   UPDATE_USER_INFO,
   SET_ANCHOR_USER_ID,
 } from '@/constants/mutation-types';
-import {
-  sdkAppId,
-  expireTime,
-  secretKey,
-  playerDomain,
-  userInfo,
-  roomInfo,
-  anchorUserInfo,
-} from '@/config/basic-info-config';
 import { mapState } from 'vuex';
 export default {
   name: 'App',
   data() {
     return {
+      ready: false,
     };
   },
   computed: {
@@ -51,23 +43,44 @@ export default {
     compMessage,
   },
   methods: {
-    handlePlayerInfo() {
-      if (sdkAppId === '' || secretKey === '') {
-        alert(`${this.$t('basic.Please configure your SDKAPPID')}\r\n\r\nconfig/basic-info-config.js`);
+    async login() {
+      const searchParams = new URLSearchParams(location.search);
+
+      const schoolId = searchParams.get('school_id');
+      const sdkappid = searchParams.get('sdkappid');
+      const token = searchParams.get('token');
+      const userId = searchParams.get('user_id');
+      const classId = searchParams.get('class_id');
+      api.setToken(token);
+      const schoolInfo = await api.getSchoolInfo(schoolId);
+      const classInfo = await api.getClassInfo(classId);
+      const userInfo = await api.getUserInfo(userId);
+      const userSig = await api.getUserSig(classId);
+
+      if (schoolInfo.data && schoolInfo.data.error_code === 0
+        && classInfo.data && classInfo.data.error_code === 0
+        && userInfo.data && userInfo.data.error_code === 0
+        && userSig.data && userSig.data.error_code === 0
+      ) {
+        const roomInfo = classInfo.data.class_info.rtc_class_info || classInfo.data.class_info.live_class_info;
+        // eslint-disable-next-line max-len
+        this.handlePlayerInfo(sdkappid, userSig.data.user_sig, classId, roomInfo.name, userInfo.data.users[0], new URL(roomInfo.live_url).hostname);
       }
-      const generator = new LibGenerateTestUserSig(sdkAppId, secretKey, expireTime);
-      const userSig = generator.genTestUserSig(userInfo.userId);
-      this.$store.commit(SET_SDK_APP_ID, sdkAppId);
+    },
+
+    handlePlayerInfo(sdkappid, userSig, roomId, roomName, userInfo,  playerDomain) {
+      this.$store.commit(SET_SDK_APP_ID, sdkappid);
       this.$store.commit(SET_USER_SIG, userSig);
       this.$store.commit(SET_PLAYER_DOMAIN, playerDomain);
-      this.$store.commit(SET_ROOM_ID, roomInfo.roomId);
-      this.$store.commit(SET_ROOM_NAME, roomInfo.roomName);
-      this.$store.commit(SET_ANCHOR_USER_ID, anchorUserInfo.userId);
+      this.$store.commit(SET_ROOM_ID, roomId);
+      this.$store.commit(SET_ROOM_NAME, roomName);
+      this.$store.commit(SET_ANCHOR_USER_ID, `${roomId}_mix`);
       this.$store.commit(UPDATE_USER_INFO, {
-        userId: userInfo.userId,
-        userName: userInfo.userName,
-        userAvatar: userInfo.userAvatar,
+        userId: userInfo.user_id,
+        userName: userInfo.nickname,
+        userAvatar: userInfo.avatar,
       });
+      this.ready = true;
     },
     // 退出直播间
     async handleExit() {
@@ -79,7 +92,7 @@ export default {
     },
   },
   created() {
-    this.handlePlayerInfo();
+    this.login();
     this.$eventBus.$on('exit', this.handleExit);
     this.$eventBus.$on('logout', this.handleLogout);
   },
@@ -101,7 +114,7 @@ export default {
   color $fontColor
   width 100%
   height 100%
-  position relative
+  position absolute
   #header
     width 100%
     height 52px

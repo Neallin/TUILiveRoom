@@ -13,10 +13,9 @@
         img(:src="userInfo.userAvatar || avatar")
       span.user-name {{userName}}
       div.user-id
-        span {{ `( ${userInfo.userId}` }}
         span.copy-icon(@click="copyUserId")
           svg-icon.copy-icon(icon-name="copy")
-        span )
+        span
     div.panel-fill(v-show="showControlTab")
     div.control-tab(v-show="showControlTab")
       div.control-item(@click="handleLogout") {{ $t('Log Out') }}

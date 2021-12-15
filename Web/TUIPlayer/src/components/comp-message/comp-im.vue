@@ -24,23 +24,6 @@ div.im-message-container
 
   //- 文字及表情输入区域
   div.content-bottom
-    //- 表情选择
-    div.content-bottom-feel
-      el-popover(
-        placement='top'
-        width='400'
-        trigger='click'
-        v-model='popoverVisible'
-      )
-        div.emojis
-          div.emoji(
-            v-for="emoji in emojiName"
-            :key="emoji"
-            @click="chooseEmoji(emoji)"
-          )
-            img(:src="emojiUrl + emojiMap[emoji]")
-        span.icon-button(slot="reference")
-          svg-icon.emoji-icon(icon-name="emoji")
     //- 文字输入
     div.content-bottom-input
       textarea.input(

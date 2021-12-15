@@ -13,10 +13,10 @@
       div.paused.control-item(v-if="playState === PLAY_STATE.PLAYING" @click="handlePause")
         svg-icon.icon(icon-name="pause")
       //- 分享按钮
-      comp-share
+      //comp-share
     div.right-container
       //- 线路选择组件
-      comp-line-check
+      //comp-line-check
       //- 全屏/取消全屏组件
       comp-full-screen
 </template>

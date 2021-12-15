@@ -33,8 +33,8 @@ export default {
     initPlayer() {
       // eslint-disable-next-line no-undef
       this.player = new TcPlayer('cdn-video-container', {
-        m3u8: `https://${this.playerDomain}/trtc_${this.sdkAppId}/${this.roomId}.m3u8`,
-        flv: `https://${this.playerDomain}/trtc_${this.sdkAppId}/${this.roomId}.flv`,
+        m3u8: `http://${this.playerDomain}/live/${this.sdkAppId}_${this.roomId}_mix.m3u8`,
+        flv: `http://${this.playerDomain}/live/${this.sdkAppId}_${this.roomId}_mix.flv`,
         autoplay: true,
         poster: '',
         width: '100%',
@@ -60,10 +60,6 @@ export default {
     },
   },
   mounted() {
-    if (this.playerDomain === '') {
-      alert(`${this.$t('basic.Please configure your playerDomain')}\r\n\r\nconfig/basic-info-config.js`);
-      return;
-    }
     this.initPlayer();
     this.$store.commit(UPDATE_PLAY_STATE, 'playing');
   },

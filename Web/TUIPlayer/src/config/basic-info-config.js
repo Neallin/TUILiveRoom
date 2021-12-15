@@ -10,7 +10,7 @@
  * 进入腾讯云实时音视频[控制台](https://console.cloud.tencent.com/rav ) 创建应用，即可看到 SDKAppId，
  * 它是腾讯云用于区分客户的唯一标识。
  */
-export const sdkAppId = 0;
+export const sdkAppId = 12323123;
 /**
 * 签名过期时间，建议不要设置的过短
 * <p>
@@ -29,7 +29,7 @@ export const expireTime = 604800;
 * 注意：该方案仅适用于调试Demo，正式上线前请将 UserSig 计算代码和密钥迁移到您的后台服务器上，以避免加密密钥泄露导致的流量盗用。
 * 文档：https://cloud.tencent.com/document/product/647/17275#Server
 */
-export const secretKey = '';
+export const secretKey = '13123';
 
 /**
 * 设置房间信息，请保证TUIPusher&TUIPlayer房间信息一致
